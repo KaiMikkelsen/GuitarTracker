@@ -10,3 +10,5 @@
 
 January 5th
 - 2 Hours: Trying to get it plugged in unsuccessfully, experiemnting with STLink
+January 6tg
+- 2 Hour: Got it connecting with a better cable, reading adc values from a potentiometer
