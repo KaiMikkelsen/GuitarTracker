@@ -21,6 +21,6 @@ January 7th
 -2 Hours: Trying and failing to get serial communication working, sound sensor not really working.
 
 January 8th
-- x hours: Serial communication solved! looking into using a microphone IC instead of piezo buzzer as my electronics knowledge is lacking
+- 4 hours: Serial communication solved! looking into using a microphone IC instead of piezo buzzer as my electronics knowledge is lacking
 
 
