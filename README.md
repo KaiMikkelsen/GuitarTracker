@@ -8,6 +8,9 @@
 - Serial communication not working
 - Solution: Created a fresh new project and used UART2 instead of Uart1?
 
+- Struggled to get values going from top of the screen to the bottom to represent the user paddle
+- Solution: Looked at logic more closely
+
 
 ## Hours
 
@@ -18,9 +21,12 @@ January 6th
 - 2 Hours: Got it connecting with a better cable, reading adc values from a potentiometer
 
 January 7th
--2 Hours: Trying and failing to get serial communication working, sound sensor not really working.
+- 2 Hours: Trying and failing to get serial communication working, sound sensor not really working.
 
 January 8th
 - 4 hours: Serial communication solved! looking into using a microphone IC instead of piezo buzzer as my electronics knowledge is lacking
+
+January 9th
+- X hours: Struggled to get acurate va
 
 
