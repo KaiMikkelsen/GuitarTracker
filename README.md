@@ -34,3 +34,7 @@ January 9th
 - X hours: Struggled to get acurate va
 
 
+## Resources
+
+Digikey stm32 tutorials: https://www.youtube.com/watch?v=EsZLgqhqfO0&ab_channel=Digi-Key
+Controllers tech on using OLED screen: https://www.youtube.com/watch?v=M5ddTjrcvEs&ab_channel=ControllersTech
