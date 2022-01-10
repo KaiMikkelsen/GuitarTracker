@@ -6,10 +6,13 @@
 - Solution: Had to use a different cable, (the one for my wireless beats headphones)
 
 - Serial communication not working
-- Solution: Created a fresh new project and used UART2 instead of Uart1?
+- Solution: Created a fresh new project and realized UART was already configured automatically with the chip, so restarting it was just wasting my time.
 
 - Struggled to get values going from top of the screen to the bottom to represent the user paddle
 - Solution: Looked at logic more closely
+
+- I2C communication with screen not working
+- Solution: having the potentiometer on the same power as the screen was messing with it, my knowledge of electronics is lacking clearly...
 
 
 ## Hours
