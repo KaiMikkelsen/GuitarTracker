@@ -1,4 +1,4 @@
-# GuitarTracker
+# Pong, Ping
 
 ## Problems I have faced:
 
@@ -12,7 +12,8 @@
 - Solution: Looked at logic more closely
 
 - I2C communication with screen not working
-- Solution: having the potentiometer on the same power as the screen was messing with it, my knowledge of electronics is lacking clearly...
+- Solution: Having the potentiometer on the same power as the screen was messing with it, my knowledge of electronics is lacking clearly...
+- Solution pt2: Figured out the potentiometer I was using to control user movement was shorting out the board or something, switched to a better joystick controller and am using the other side of the board for ADC which is working fine for now..
 
 
 ## Hours
