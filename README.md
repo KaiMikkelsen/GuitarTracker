@@ -31,7 +31,7 @@ January 8th
 - 4 hours: Serial communication solved! looking into using a microphone IC instead of piezo buzzer as my electronics knowledge is lacking
 
 January 9th
-- X hours: Struggled to get acurate va
+- 8 hours: Struggled to get acurate readings on ADC, ended the day getting a user bar floating up and down depending on joystick position, took me much too long
 
 
 ## Resources
