@@ -557,7 +557,6 @@ void userPaddle(void *argument)
 			  SSD1306_Clear();
 			  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
 			 SSD1306_UpdateScreen();
-			   //HAL_Delay(2000);
 		  }
 
 	  }
