@@ -33,6 +33,9 @@ January 8th
 January 9th
 - 8 hours: Struggled to get acurate readings on ADC, ended the day getting a user bar floating up and down depending on joystick position, took me much too long
 
+January 10th
+- 1 hour: Created a display thread, added a ball
+
 
 ## Resources
 
