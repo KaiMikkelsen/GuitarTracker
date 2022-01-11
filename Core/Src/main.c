@@ -70,6 +70,13 @@ const osThreadAttr_t opponent_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Draw */
+osThreadId_t DrawHandle;
+const osThreadAttr_t Draw_attributes = {
+  .name = "Draw",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -83,6 +90,7 @@ static void MX_I2C1_Init(void);
 void userPaddle(void *argument);
 void ball(void *argument);
 void oponentPaddle(void *argument);
+void DrawScreen(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -90,6 +98,14 @@ void oponentPaddle(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+//uint16_t YScrollValue;
+uint16_t playerBarYPosition = 15;
+uint16_t playerBarLength = 18;
+uint16_t playerBarWidth = 5;
+
+
 
 /* USER CODE END 0 */
 
@@ -183,6 +199,9 @@ int main(void)
 
   /* creation of opponent */
   opponentHandle = osThreadNew(oponentPaddle, NULL, &opponent_attributes);
+
+  /* creation of Draw */
+  DrawHandle = osThreadNew(DrawScreen, NULL, &Draw_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -507,17 +526,17 @@ void userPaddle(void *argument)
 	//	uint16_t raw;
 		//char msg[10];
 
-		uint16_t YScrollValue;
-		uint16_t playerBarLength = 18;
-		uint16_t playerBarWidth = 5;
-		uint16_t playerBarYPosition = 15; //initialized about a quarter of the way down
-
+		//uint16_t YScrollValue;
+		//uint16_t playerBarLength = 18;
+		//uint16_t playerBarWidth = 5;
+		//uint16_t playerBarYPosition = 15; //initialized about a quarter of the way down
+/*
 
 		SSD1306_Clear();
 		SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
 		SSD1306_UpdateScreen();
-
-
+*/
+	uint16_t YScrollValue;
 
   for(;;)
   {
@@ -538,9 +557,9 @@ void userPaddle(void *argument)
 		  {
 			  playerBarYPosition += 1;
 
-			  SSD1306_Clear();
-			  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
-			  SSD1306_UpdateScreen();
+			  //SSD1306_Clear();
+			  //SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+			  //SSD1306_UpdateScreen();
 
 
 		  }
@@ -554,30 +573,15 @@ void userPaddle(void *argument)
 			  playerBarYPosition -= 1;
 
 
-			  SSD1306_Clear();
-			  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
-			 SSD1306_UpdateScreen();
+			  //SSD1306_Clear();
+			  //SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+			 //SSD1306_UpdateScreen();
 		  }
 
 	  }
 
 
-
-
-
-
-
-
 	  //HAL_Delay(10);
-
-
-
-
-
-
-
-
-
 
 
     osDelay(1);
@@ -619,6 +623,41 @@ void oponentPaddle(void *argument)
     osDelay(1);
   }
   /* USER CODE END oponentPaddle */
+}
+
+/* USER CODE BEGIN Header_DrawScreen */
+/**
+* @brief Function implementing the Draw thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_DrawScreen */
+void DrawScreen(void *argument)
+{
+  /* USER CODE BEGIN DrawScreen */
+
+
+	 uint16_t PlayerPaddleMoved;
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  SSD1306_Clear();
+
+	  //if(PlayerPaddleMoved != playerBarYPosition) // to not make it flicer if its just still
+	  //{
+		  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+		  PlayerPaddleMoved = playerBarYPosition;
+	 // }
+
+
+	  SSD1306_DrawCircle(30, 30, 4, SSD1306_COLOR_WHITE);
+
+
+	  SSD1306_UpdateScreen();
+	  osDelay(1);
+  }
+  /* USER CODE END DrawScreen */
 }
 
 /**
