@@ -10,8 +10,9 @@ objects.mk
 sources.mk
 Core/Startup
 .cproject
-.mxprojct
+.mxproject
 .project
 PONG\ Debug.launch
 STM32L432KCUX_FLASH.ld
+.settings
 Debug
