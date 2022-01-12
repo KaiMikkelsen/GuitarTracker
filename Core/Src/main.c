@@ -25,6 +25,7 @@
 #include "ssd1306.h"
 #include "fonts.h"
 #include "test.h"
+#include <math.h>
 
 /* USER CODE END Includes */
 
@@ -101,32 +102,34 @@ void DrawScreen(void *argument);
 
 
 //uint16_t YScrollValue;
-uint16_t playerBarYPosition = 15;
-const uint16_t playerBarLength = 18;
-const uint16_t playerBarWidth = 5;
+uint16_t playerYPosition = 15;
+const uint16_t paddleLength = 20;
+const uint16_t paddleWidth = 5;
 
-uint16_t opponentBarYPosition = 15;
+uint16_t opponentYPosition = 15;
 const uint16_t opponentBarLength = 18;
 const uint16_t opponentBarWidth = 5;
 
 
-uint16_t ballXPosition;
-uint16_t ballYPosition;
+int16_t ballXPosition;
+int16_t ballYPosition;
 
-uint16_t ballXVelocity;
-uint16_t ballYVelocity;
+int16_t ballXVelocity;
+int16_t ballYVelocity;
 
-uint16_t ballXDirection;
-uint16_t ballYDirection;
+int16_t ballXDirection;
+int16_t ballYDirection;
 
 
 
 const uint16_t ballRadius = 4;
+const uint16_t halfBallRadius = ballRadius/2;
 
 const uint16_t leftEdge = 5;
 const uint16_t rightEdge = 123;
 
-
+uint16_t playerScored = 0;
+uint16_t opponentScored = 0;
 
 
 
@@ -557,15 +560,12 @@ void userPaddle(void *argument)
 	  HAL_ADC_PollForConversion(&hadc1, 10);
 	  YScrollValue = HAL_ADC_GetValue(&hadc1);
 
-	  //ScrollValue = 0;
-	  //0//4095
-
 	  if(YScrollValue == 0) //Up
 	  {
 
-		  if(playerBarYPosition < SSD1306_HEIGHT - playerBarLength)
+		  if(playerYPosition < SSD1306_HEIGHT - paddleLength)
 		  {
-			  playerBarYPosition += 1;
+			  playerYPosition += 1;
 
 		  }
 
@@ -573,9 +573,9 @@ void userPaddle(void *argument)
 
 	  if(YScrollValue == 4095)//down
 	  {
-		  if(playerBarYPosition > 0)
+		  if(playerYPosition > 0)
 		  {
-			  playerBarYPosition -= 1;
+			  playerYPosition -= 1;
 
 		  }
 	  }
@@ -597,44 +597,107 @@ void ball(void *argument)
 {
   /* USER CODE BEGIN ball */
   /* Infinite loop */
-	ballXPosition = 30;
+	ballXPosition = 50;
 	ballYPosition = 30;
 
 	ballXDirection = 1;
 	ballYDirection = 1;
 
-	ballXVelocity = 3;
+	ballXVelocity = -1;
 	ballYVelocity = 1;
 
-	uint16_t leftEdge = 0 + playerBarWidth;
-	uint16_t rightEdge = SSD1306_WIDTH - playerBarWidth;
-
-
+	uint16_t leftEdge = 0 + paddleWidth;
+	uint16_t rightEdge = SSD1306_WIDTH - paddleWidth;
+	uint16_t maxBounceAngle = 75;
 
 
   for(;;)
   {
-/*
-	  if(ballXPosition - ballRadius == leftEdge || ballXPosition + ballRadius == rightEdge)
+
+//! or not function needed here
+
+	  uint16_t centralizedBallYPosition = ballYPosition + halfBallRadius;
+
+	  //Player
+	  if(ballXPosition - ballRadius <= leftEdge)
 	  {
-		  ballXVelocity *= -1;
+		 if((centralizedBallYPosition >= playerYPosition) && (centralizedBallYPosition <= playerYPosition + paddleLength))
+		 {
 
-	  }
+			 //Calculate if on right or left side of paddle and how far along
+			 //uint16_t normalizedBallPosition = playerYPosition + paddleLength - centralizedBallYPosition;
+
+			 int16_t relativeIntersectY = (playerYPosition+(paddleLength/2)) - centralizedBallYPosition;
+			 //10 to -10
+
+			 double normalizedRelativeIntersectionY = ((double)relativeIntersectY/((double)paddleLength/2));
+			 double bounceAngle = (double)normalizedRelativeIntersectionY * (double)maxBounceAngle;
 
 
-	  ballXPosition = ballXPosition + (ballXVelocity * 1);
+			 ballXDirection = ballXVelocity*cos(bounceAngle);
+			 ballYDirection = ballYVelocity*-sin(bounceAngle);
+
+/*
+			 if(normalizedBallPosition < paddleLength/2)
+			 {
+				 //Bottom of the paddle
+
+			 }
+			 else if(normalizedBallPosition > paddleLength/2)
+			 {
+				//TOP of the paddle
+
+			 }
+			 else //equal
+			 {
+				 //Middle of the paddle
+
+
+			 }
+		//	 double angleCalc = (double)normalizedBallPosition/(double)paddleLength;
 
 */
 
-	  if(ballXPosition - ballRadius <= leftEdge || ballXPosition + ballRadius >= rightEdge)
+
+		 //	ballXDirection *= -1;
+		 }
+
+
+	  }
+
+	  //Opponent
+	  else if(ballXPosition + ballRadius >= rightEdge)
 	  {
-		  ballXDirection *= -1;
+
+		 if((centralizedBallYPosition >= opponentYPosition) && (centralizedBallYPosition <=opponentYPosition + paddleLength))
+		 {
+
+			 ballXDirection *= -1;
+		 }
 
 	  }
 
 
-	  ballXPosition = ballXPosition + (ballXDirection * ballXVelocity);
 
+
+	  ballXPosition = ballXPosition + (ballXDirection * ballXVelocity);
+	  ballYPosition = ballYPosition + (ballYDirection * ballYVelocity);
+
+
+
+	  if(ballXPosition <=0 )
+	  {
+
+		  opponentScored = 1;
+
+	  }
+
+
+	  if(ballXPosition >= 140)
+	  {
+		  playerScored = 1;
+
+	  }
 
     osDelay(1);
   }
@@ -654,6 +717,10 @@ void oponentPaddle(void *argument)
   /* Infinite loop */
   for(;;)
   {
+
+	  opponentYPosition = ballYPosition;
+
+
     osDelay(1);
   }
   /* USER CODE END oponentPaddle */
@@ -671,7 +738,7 @@ void DrawScreen(void *argument)
   /* USER CODE BEGIN DrawScreen */
 
 
-	 uint16_t PlayerPaddleMoved;
+	// uint16_t PlayerPaddleMoved;
 
   /* Infinite loop */
   for(;;)
@@ -679,21 +746,35 @@ void DrawScreen(void *argument)
 	  SSD1306_Clear();
 
 	  //if(PlayerPaddleMoved != playerBarYPosition) // to not make it flicer if its just still
-	  //{
+	  //{playerScored = 0;
+	  uint16_t opponentScored = 0;
 
-	  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+	  if(playerScored)
+	  {
+		  SSD1306_GotoXY(0,0);
 
+		  SSD1306_Puts("Player scored", &Font_11x18, 1);
 
+		  //HAL_Delay(3000);
+	  }
+	  else if(opponentScored)
+	  {
+		  SSD1306_GotoXY(0,0);
 
+		  SSD1306_Puts("Opponent Scored", &Font_11x18, 1);
 
-	  SSD1306_DrawRectangle(SSD1306_WIDTH - playerBarWidth, opponentBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+		  //HAL_Delay(3000);
 
-	 // }
+	  }
+	  else
+	  {
+		  SSD1306_DrawRectangle(0, playerYPosition, paddleWidth, paddleLength, SSD1306_COLOR_WHITE);
 
+		  SSD1306_DrawRectangle(SSD1306_WIDTH - paddleWidth, opponentYPosition, paddleWidth, paddleLength, SSD1306_COLOR_WHITE);
 
-	  SSD1306_DrawCircle(ballXPosition, ballYPosition, ballRadius, SSD1306_COLOR_WHITE);
+		  SSD1306_DrawCircle(ballXPosition, ballYPosition, ballRadius, SSD1306_COLOR_WHITE);
 
-
+	  }
 	  SSD1306_UpdateScreen();
 	  osDelay(1);
   }
