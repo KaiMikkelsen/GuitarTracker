@@ -102,8 +102,31 @@ void DrawScreen(void *argument);
 
 //uint16_t YScrollValue;
 uint16_t playerBarYPosition = 15;
-uint16_t playerBarLength = 18;
-uint16_t playerBarWidth = 5;
+const uint16_t playerBarLength = 18;
+const uint16_t playerBarWidth = 5;
+
+uint16_t opponentBarYPosition = 15;
+const uint16_t opponentBarLength = 18;
+const uint16_t opponentBarWidth = 5;
+
+
+uint16_t ballXPosition;
+uint16_t ballYPosition;
+
+uint16_t ballXVelocity;
+uint16_t ballYVelocity;
+
+uint16_t ballXDirection;
+uint16_t ballYDirection;
+
+
+
+const uint16_t ballRadius = 4;
+
+const uint16_t leftEdge = 5;
+const uint16_t rightEdge = 123;
+
+
 
 
 
@@ -153,16 +176,16 @@ int main(void)
 
   SSD1306_Init();
 
-   SSD1306_GotoXY(0,0);
+  SSD1306_GotoXY(0,0);
 
-   SSD1306_Puts("starting", &Font_11x18, 1);
-   SSD1306_GotoXY(10, 30);
-   SSD1306_Puts("    WORLD: ", &Font_11x18, 1);
-   SSD1306_UpdateScreen();
+  SSD1306_Puts("starting", &Font_11x18, 1);
+  SSD1306_GotoXY(10, 30);
+  SSD1306_Puts("    WORLD: ", &Font_11x18, 1);
+  SSD1306_UpdateScreen();
 
-   HAL_Delay(200);
+  HAL_Delay(200);
 
-   SSD1306_Clear();
+  SSD1306_Clear();
 
 
 
@@ -522,20 +545,7 @@ void userPaddle(void *argument)
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
 
-	//uint8_t buf[12];
-	//	uint16_t raw;
-		//char msg[10];
 
-		//uint16_t YScrollValue;
-		//uint16_t playerBarLength = 18;
-		//uint16_t playerBarWidth = 5;
-		//uint16_t playerBarYPosition = 15; //initialized about a quarter of the way down
-/*
-
-		SSD1306_Clear();
-		SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
-		SSD1306_UpdateScreen();
-*/
 	uint16_t YScrollValue;
 
   for(;;)
@@ -557,11 +567,6 @@ void userPaddle(void *argument)
 		  {
 			  playerBarYPosition += 1;
 
-			  //SSD1306_Clear();
-			  //SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
-			  //SSD1306_UpdateScreen();
-
-
 		  }
 
 	  }
@@ -572,16 +577,8 @@ void userPaddle(void *argument)
 		  {
 			  playerBarYPosition -= 1;
 
-
-			  //SSD1306_Clear();
-			  //SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
-			 //SSD1306_UpdateScreen();
 		  }
-
 	  }
-
-
-	  //HAL_Delay(10);
 
 
     osDelay(1);
@@ -600,8 +597,45 @@ void ball(void *argument)
 {
   /* USER CODE BEGIN ball */
   /* Infinite loop */
+	ballXPosition = 30;
+	ballYPosition = 30;
+
+	ballXDirection = 1;
+	ballYDirection = 1;
+
+	ballXVelocity = 3;
+	ballYVelocity = 1;
+
+	uint16_t leftEdge = 0 + playerBarWidth;
+	uint16_t rightEdge = SSD1306_WIDTH - playerBarWidth;
+
+
+
+
   for(;;)
   {
+/*
+	  if(ballXPosition - ballRadius == leftEdge || ballXPosition + ballRadius == rightEdge)
+	  {
+		  ballXVelocity *= -1;
+
+	  }
+
+
+	  ballXPosition = ballXPosition + (ballXVelocity * 1);
+
+*/
+
+	  if(ballXPosition - ballRadius <= leftEdge || ballXPosition + ballRadius >= rightEdge)
+	  {
+		  ballXDirection *= -1;
+
+	  }
+
+
+	  ballXPosition = ballXPosition + (ballXDirection * ballXVelocity);
+
+
     osDelay(1);
   }
   /* USER CODE END ball */
@@ -646,12 +680,18 @@ void DrawScreen(void *argument)
 
 	  //if(PlayerPaddleMoved != playerBarYPosition) // to not make it flicer if its just still
 	  //{
-		  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
-		  PlayerPaddleMoved = playerBarYPosition;
+
+	  SSD1306_DrawRectangle(0, playerBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+
+
+
+
+	  SSD1306_DrawRectangle(SSD1306_WIDTH - playerBarWidth, opponentBarYPosition, playerBarWidth, playerBarLength, SSD1306_COLOR_WHITE);
+
 	 // }
 
 
-	  SSD1306_DrawCircle(30, 30, 4, SSD1306_COLOR_WHITE);
+	  SSD1306_DrawCircle(ballXPosition, ballYPosition, ballRadius, SSD1306_COLOR_WHITE);
 
 
 	  SSD1306_UpdateScreen();
