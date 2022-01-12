@@ -36,8 +36,12 @@ January 9th
 January 10th
 - 1 hour: Created a display thread, added a ball
 
+January 11th
+- 2 hours: Got basic X axis collision working and working on Y angles to add spin to the ball
+
 
 ## Resources
 
 Digikey stm32 tutorials: https://www.youtube.com/watch?v=EsZLgqhqfO0&ab_channel=Digi-Key
 Controllers tech on using OLED screen: https://www.youtube.com/watch?v=M5ddTjrcvEs&ab_channel=ControllersTech
+StackOverflow user on how to calculate y collision angles:https://gamedev.stackexchange.com/questions/4253/in-pong-how-do-you-calculate-the-balls-direction-when-it-bounces-off-the-paddl
