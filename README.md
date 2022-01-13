@@ -43,6 +43,9 @@ January 10th
 January 11th
 - 2 hours: Got basic X axis collision working and working on Y angles to add spin to the ball
 
+January 12th
+- 2 hours: Back and forth gameplay working, next to implement is the score system
+
 
 ## Resources
 
