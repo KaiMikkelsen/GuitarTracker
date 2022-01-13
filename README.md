@@ -13,7 +13,11 @@
 
 - I2C communication with screen not working
 - Solution: Having the potentiometer on the same power as the screen was messing with it, my knowledge of electronics is lacking clearly...
-- Solution pt2: Figured out the potentiometer I was using to control user movement was shorting out the board or something, switched to a better joystick controller and am using the other side of the board for ADC which is working fine for now..
+- Solution pt2: Figured out the potentiometer I was using to control user movement was shorting out the board or something, switched to a better joystick controller and am using the other side of the board for ADC which is working fine for now...
+
+- Such a small limited number of pixels on the screen, and the minimum ball speed is 1pixel per frame, and i dont want to use floating point numbers as its not recommended for microcontroller programming, how can i do this with ints, while still creating playable movement in the x/y directions.
+- Solution:
+- 
 
 
 ## Hours
