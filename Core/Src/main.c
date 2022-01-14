@@ -26,6 +26,8 @@
 #include "fonts.h"
 #include "test.h"
 #include <math.h>
+#include<stdio.h>
+#include<string.h>
 
 /* USER CODE END Includes */
 
@@ -102,14 +104,27 @@ void DrawScreen(void *argument);
 
 
 //uint16_t YScrollValue;
-uint16_t playerYPosition = 15;
+int16_t playerYPosition = 15;
 const uint16_t paddleLength = 20;
 const uint16_t paddleWidth = 5;
 
-uint16_t opponentYPosition = 15;
+int16_t opponentYPosition = SSD1306_HEIGHT/2;
 const uint16_t opponentBarLength = 18;
 const uint16_t opponentBarWidth = 5;
 
+
+//defaults
+int16_t defaultBallXPosition = SSD1306_WIDTH/2;
+int16_t defaultBallYPosition = SSD1306_HEIGHT/2;
+
+int16_t defaultBallXVelocity = 3;
+int16_t defaultballYVelocity = 0;
+
+int16_t defaultballXDirection = -1;
+int16_t defaultballYDirection = 0;
+//
+
+uint16_t addedVelocity = 0;
 
 int16_t ballXPosition;
 int16_t ballYPosition;
@@ -120,16 +135,19 @@ int16_t ballYVelocity;
 int16_t ballXDirection;
 int16_t ballYDirection;
 
-
+uint16_t playerScore = 0;
+uint16_t opponentScore = 0;
 
 const uint16_t ballRadius = 4;
-const uint16_t halfBallRadius = ballRadius/2;
+uint16_t halfBallRadius = ballRadius/2;
 
 const uint16_t leftEdge = 5;
 const uint16_t rightEdge = 123;
 
 uint16_t playerScored = 0;
 uint16_t opponentScored = 0;
+
+uint16_t defaultBallSpeed = 3;
 
 
 
@@ -550,6 +568,7 @@ void userPaddle(void *argument)
 
 
 	uint16_t YScrollValue;
+	uint16_t dyPerFrame = 3;
 
   for(;;)
   {
@@ -560,25 +579,32 @@ void userPaddle(void *argument)
 	  HAL_ADC_PollForConversion(&hadc1, 10);
 	  YScrollValue = HAL_ADC_GetValue(&hadc1);
 
-	  if(YScrollValue == 0) //Up
+	  if(YScrollValue == 0)
 	  {
 
-		  if(playerYPosition < SSD1306_HEIGHT - paddleLength)
+		  if(playerYPosition < SSD1306_HEIGHT - paddleLength) //Go Down
 		  {
-			  playerYPosition += 1;
+			  playerYPosition += dyPerFrame;
 
 		  }
 
 	  }
 
-	  if(YScrollValue == 4095)//down
+	  if(YScrollValue == 4095)
 	  {
-		  if(playerYPosition > 0)
+		  if(playerYPosition > dyPerFrame)
 		  {
-			  playerYPosition -= 1;
+			  playerYPosition -= dyPerFrame;
+
+			  if(playerYPosition < dyPerFrame)
+			  {
+				  playerYPosition = 0;
+			  }
 
 		  }
 	  }
+
+
 
 
     osDelay(1);
@@ -603,22 +629,23 @@ void ball(void *argument)
 	ballXDirection = -1;
 	ballYDirection = 0;
 
-	ballXVelocity = 1;
+	ballXVelocity = 3;
 	ballYVelocity = 1;
+
+
 
 	uint16_t leftEdge = 0 + paddleWidth;
 	uint16_t rightEdge = SSD1306_WIDTH - paddleWidth;
-	uint16_t maxBounceAngle = 75;
 
-	uint16_t BALLSPEED = 3;
 
 
   for(;;)
   {
 
-//! or not function needed here
 
-	  uint16_t centralizedBallYPosition = ballYPosition - halfBallRadius;
+	  //uint16_t centralizedBallYPosition = ballYPosition - halfBallRadius;
+
+
 
 
 	  if(ballXPosition <=0 )
@@ -639,9 +666,9 @@ void ball(void *argument)
 	  //Player
 	  else if(ballXPosition - ballRadius <= leftEdge)
 	  {
-		 if((centralizedBallYPosition >= playerYPosition) && (centralizedBallYPosition <= playerYPosition + paddleLength))
+		 if((ballYPosition >= playerYPosition) && (ballYPosition <= playerYPosition + paddleLength) && (ballXDirection == -1))
 		 {
-			 int16_t relativeIntersectY = (playerYPosition+(paddleLength/2)) - centralizedBallYPosition;
+			 int16_t relativeIntersectY = (playerYPosition+(paddleLength/2)) - ballYPosition;
 			 //10 to -10
 
 
@@ -653,11 +680,9 @@ void ball(void *argument)
 
 				 ballYVelocity = relativeIntersectY/2;
 
-				// int a = (59 + (4 - 1)) / 4;
+				 ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
 
-				// ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY) + (1)) /2;
-				 ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + 1;
-
+				 addedVelocity++;
 				ballYDirection = 1;
 
 
@@ -667,17 +692,17 @@ void ball(void *argument)
 			 {
 
 				 ballYVelocity = relativeIntersectY/2;
-				// ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
-				 ballXVelocity = (((paddleLength/2) - relativeIntersectY))/2 + 1;
+				 ballXVelocity = (((paddleLength/2) - relativeIntersectY))/2 + addedVelocity;
+				 addedVelocity++;
 				 ballYDirection = -1;
 
 
 			 }
-			 else
+			 else if(relativeIntersectY == 0)
 			 {
-				ballYVelocity = relativeIntersectY/2;
-				//ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
 
+				ballYVelocity = relativeIntersectY/2 + addedVelocity;
+				addedVelocity++;
 			 }
 
 
@@ -691,10 +716,10 @@ void ball(void *argument)
 	  else if(ballXPosition + ballRadius >= rightEdge)
 	  {
 
-		 if((centralizedBallYPosition >= opponentYPosition) && (centralizedBallYPosition <=opponentYPosition + paddleLength))
+		 if((ballYPosition >= opponentYPosition) && (ballYPosition <=opponentYPosition + paddleLength) && (ballXDirection == 1))
 		 {
 
-			int16_t relativeIntersectY = (opponentYPosition+(paddleLength/2)) - centralizedBallYPosition;
+			int16_t relativeIntersectY = (opponentYPosition+(paddleLength/2)) - ballYPosition;
 						 //10 to -10
 
 
@@ -710,40 +735,44 @@ void ball(void *argument)
 
 
 
-				}
-				else if(relativeIntersectY > 1)
-				{
+			}
+			else if(relativeIntersectY > 1)
+			{
 
 					ballYVelocity = relativeIntersectY/2;
 					ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
 					ballYDirection = -1;
 
 
-				}
-				else
-				{
-					ballYVelocity = relativeIntersectY/2;
+			}
+			else
+			{
+				ballYVelocity = relativeIntersectY/2 + addedVelocity;
 					//ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
 
-				}
+			}
+
+
+			addedVelocity++;
+			ballXDirection *= -1;
 
 
 
-				ballXDirection *= -1;
 		 }
 
 	  }
 
 
 	  //Top
-	  if(ballYPosition <= 0 || ballYPosition >= 60)
+	  if(ballYPosition < halfBallRadius || ballYPosition + halfBallRadius >= 60)
 	  {
 		  ballYDirection *= -1;
+		  ballXVelocity++;
 
 
 	  }
 
-	  //Bottom
+
 
 
 	  ballXPosition = ballXPosition + (ballXDirection * ballXVelocity);
@@ -774,20 +803,83 @@ void oponentPaddle(void *argument)
 {
   /* USER CODE BEGIN oponentPaddle */
   /* Infinite loop */
+
+	uint16_t frameSkip = 0;
+
   for(;;)
   {
-	  if(opponentYPosition < SSD1306_HEIGHT - paddleLength)
+
+
+	//  if(frameSkip % 8 == 0)
+	//  {
+
+	  /*
+		  if(ballYPosition < SSD1306_HEIGHT - paddleLength/2)
+		 	  {
+		 		  if(ballYPosition > paddleLength/2)
+		 		  {
+		 		  	opponentYPosition = ballYPosition-paddleLength/2;
+		 		  }
+		 	  }
+		 	  */
+
+	 //if(ballYPosition < SSD1306_HEIGHT - paddleLength/2)
+	 //{
+
+
+	  if(ballYPosition < opponentYPosition - paddleLength/2)
 	  {
-		  opponentYPosition = ballYPosition-paddleLength/2;
-	}
+			if(opponentYPosition < SSD1306_HEIGHT - paddleLength/2)
+			{
+				if(opponentYPosition > paddleLength/2)
+			 	{
+					opponentYPosition--;
+			 	}
+			 }
 
-	  if(opponentYPosition > 0)
-	  		  {
-	  		  opponentYPosition = ballYPosition-paddleLength/2;
-	  		  }
+
+	  }
+	  if(ballYPosition > opponentYPosition - paddleLength/2)
+	  {
+
+			if(opponentYPosition < SSD1306_HEIGHT - paddleLength/2)
+			{
+				if(opponentYPosition > paddleLength/2)
+			 	{
+					opponentYPosition++;
+			 	}
+			 }
 
 
-	  //opponentYPosition = ballYPosition-paddleLength/2;
+	  }
+
+
+	  /*
+	if(opponentYPosition < SSD1306_HEIGHT - paddleLength/2)
+	{
+		if(opponentYPosition > paddleLength/2)
+	 	{
+	 		 //opponentYPosition = ballYPosition-paddleLength/2;
+			//opponentYPosition = opponentYPosition + (ballYDirection * 3);
+	 	}
+	 }
+*/
+		 // opponentYPosition =+ ballYDirection;
+
+
+		 // frameSkip++;
+
+	 // }
+	 // else
+	//  {
+	//	  frameSkip = 0;
+	//  }
+
+
+
+
+
+
 
 
     osDelay(1);
@@ -808,6 +900,7 @@ void DrawScreen(void *argument)
 
 
 	// uint16_t PlayerPaddleMoved;
+	char msg[4];
 
   /* Infinite loop */
   for(;;)
@@ -818,32 +911,91 @@ void DrawScreen(void *argument)
 	  //{playerScored = 0;
 
 
-	  if(playerScored)
-	  {
-		  SSD1306_GotoXY(0,0);
 
-		  SSD1306_Puts("Player scored", &Font_11x18, 1);
+	  	  SSD1306_DrawFilledRectangle(0, playerYPosition, paddleWidth, paddleLength, SSD1306_COLOR_WHITE);
 
-		  //HAL_Delay(3000);
-	  }
-	  if(opponentScored)
-	  {
-		  SSD1306_GotoXY(0,0);
-
-		  SSD1306_Puts("Opponent Scored", &Font_11x18, 1);
-
-		  //HAL_Delay(3000);
-
-	  }
-	  else
-	  {
-		  SSD1306_DrawRectangle(0, playerYPosition, paddleWidth, paddleLength, SSD1306_COLOR_WHITE);
-
-		  SSD1306_DrawRectangle(SSD1306_WIDTH - paddleWidth, opponentYPosition, paddleWidth, paddleLength, SSD1306_COLOR_WHITE);
+	  	  SSD1306_DrawFilledRectangle(SSD1306_WIDTH - paddleWidth, opponentYPosition, paddleWidth, paddleLength, SSD1306_COLOR_WHITE);
 
 		  SSD1306_DrawCircle(ballXPosition, ballYPosition, ballRadius, SSD1306_COLOR_WHITE);
 
-	  }
+
+
+		  if(playerScored)
+		  {
+			 SSD1306_GotoXY(40,10);
+
+			 sprintf(msg, "%hu", playerScore);
+
+			 SSD1306_Puts(&msg, &Font_16x26, 1);
+
+
+			 SSD1306_GotoXY(74,10);
+
+			 sprintf(msg, "%hu", opponentScore);
+
+			 SSD1306_Puts(&msg, &Font_16x26, 1);
+
+			 ballXPosition = 50;
+			 ballYPosition = 30;
+
+			 ballXDirection = -1;
+			 ballYDirection = 0;
+
+			 ballXVelocity = 3;
+			 ballYVelocity = 0;
+
+			 playerScore++;
+
+			 playerScored = 0;
+
+
+			 addedVelocity = 0;
+			 SSD1306_UpdateScreen();
+			 HAL_Delay(1500);
+
+		  }
+		  if(opponentScored)
+		  {
+
+
+			 SSD1306_GotoXY(40,10);
+
+			 sprintf(msg, "%hu", playerScore);
+
+			 SSD1306_Puts(&msg, &Font_16x26, 1);
+
+
+			 SSD1306_GotoXY(74,10);
+
+			 sprintf(msg, "%hu", opponentScore);
+
+			 SSD1306_Puts(&msg, &Font_16x26, 1);
+
+
+			 ballXPosition = 50;
+			 ballYPosition = 30;
+
+			 ballXDirection = -1;
+			 ballYDirection = 0;
+
+			 ballXVelocity = 3;
+			 ballYVelocity = 0;
+
+
+			 opponentScore++;
+			 opponentScored = 0;
+
+			 addedVelocity = 0;
+
+			 SSD1306_UpdateScreen();
+			 HAL_Delay(1500);
+
+		  }
+
+
+	SSD1306_DrawLine(0, ballYPosition, SSD1306_WIDTH , ballYPosition, SSD1306_COLOR_WHITE);
+
+
 	  SSD1306_UpdateScreen();
 	  osDelay(1);
   }
