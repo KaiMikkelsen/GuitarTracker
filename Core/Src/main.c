@@ -613,6 +613,17 @@ void userPaddle(void *argument)
 }
 
 /* USER CODE BEGIN Header_ball */
+
+
+void calculateXYVelocity(int16_t relativeIntersectY)
+{
+	ballYVelocity = relativeIntersectY/2;
+	ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
+
+}
+
+
+
 /**
 * @brief Function implementing the ballControl thread.
 * @param argument: Not used
@@ -634,18 +645,13 @@ void ball(void *argument)
 
 
 
-	uint16_t leftEdge = 0 + paddleWidth;
-	uint16_t rightEdge = SSD1306_WIDTH - paddleWidth;
+	uint16_t leftPlayableEdge = 0 + paddleWidth;
+	uint16_t rightPlayableEdge = SSD1306_WIDTH - paddleWidth;
 
 
 
   for(;;)
   {
-
-
-	  //uint16_t centralizedBallYPosition = ballYPosition - halfBallRadius;
-
-
 
 
 	  if(ballXPosition <=0 )
@@ -656,7 +662,7 @@ void ball(void *argument)
 	  }
 
 
-	  else if(ballXPosition >= 140)
+	  else if(ballXPosition >= SSD1306_WIDTH)
 	  {
 		  playerScored = 1;
 
@@ -664,40 +670,46 @@ void ball(void *argument)
 
 
 	  //Player
-	  else if(ballXPosition - ballRadius <= leftEdge)
+	  else if(ballXPosition - ballRadius <= leftPlayableEdge)
 	  {
+
 		 if((ballYPosition >= playerYPosition) && (ballYPosition <= playerYPosition + paddleLength) && (ballXDirection == -1))
 		 {
 			 int16_t relativeIntersectY = (playerYPosition+(paddleLength/2)) - ballYPosition;
-			 //10 to -10
 
 
+			 //ball is on LOWER half of paddle
 			 if(relativeIntersectY < -1)
 			 {
-				 //create speed x y ratio
+
 				 relativeIntersectY = relativeIntersectY * -1;
 
+				 calculateXYVelocity(relativeIntersectY);
 
-				 ballYVelocity = relativeIntersectY/2;
-
-				 ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
+				 //ballYVelocity = relativeIntersectY/2;
+				// ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
 
 				 //addedVelocity++;
-				ballYDirection = 1;
+				 ballYDirection = 1;
 
 
 
 			 }
+			 //ball is on UPPER half of paddle
 			 else if(relativeIntersectY > 1)
 			 {
 
-				 ballYVelocity = relativeIntersectY/2;
-				 ballXVelocity = (((paddleLength/2) - relativeIntersectY))/2 + addedVelocity;
+				 //ballYVelocity = relativeIntersectY/2;
+				// ballXVelocity = (((paddleLength/2) - relativeIntersectY))/2 + addedVelocity;
+
+				 calculateXYVelocity(relativeIntersectY);
+
 				 //addedVelocity++;
 				 ballYDirection = -1;
 
 
 			 }
+			 //right in middle of paddle
 			 else if(relativeIntersectY == 0)
 			 {
 
@@ -716,7 +728,7 @@ void ball(void *argument)
 	  }
 
 	  //Opponent
-	  else if(ballXPosition + ballRadius >= rightEdge)
+	  else if(ballXPosition + ballRadius >= rightPlayableEdge)
 	  {
 
 		  if((ballYPosition >= opponentYPosition) && (ballYPosition <=opponentYPosition + paddleLength) && (ballXDirection == 1))
