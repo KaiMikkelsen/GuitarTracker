@@ -682,7 +682,7 @@ void ball(void *argument)
 
 				 ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
 
-				 addedVelocity++;
+				 //addedVelocity++;
 				ballYDirection = 1;
 
 
@@ -693,7 +693,7 @@ void ball(void *argument)
 
 				 ballYVelocity = relativeIntersectY/2;
 				 ballXVelocity = (((paddleLength/2) - relativeIntersectY))/2 + addedVelocity;
-				 addedVelocity++;
+				 //addedVelocity++;
 				 ballYDirection = -1;
 
 
@@ -702,11 +702,14 @@ void ball(void *argument)
 			 {
 
 				ballYVelocity = relativeIntersectY/2 + addedVelocity;
-				addedVelocity++;
+				ballXVelocity += addedVelocity;
+				//addedVelocity++;
 			 }
 
-
+			addedVelocity++;
 		 	ballXDirection *= -1;
+
+
 		 }
 
 
@@ -716,44 +719,45 @@ void ball(void *argument)
 	  else if(ballXPosition + ballRadius >= rightEdge)
 	  {
 
-		 if((ballYPosition >= opponentYPosition) && (ballYPosition <=opponentYPosition + paddleLength) && (ballXDirection == 1))
-		 {
+		  if((ballYPosition >= opponentYPosition) && (ballYPosition <=opponentYPosition + paddleLength) && (ballXDirection == 1))
+		  {
 
-			int16_t relativeIntersectY = (opponentYPosition+(paddleLength/2)) - ballYPosition;
+			  int16_t relativeIntersectY = (opponentYPosition+(paddleLength/2)) - ballYPosition;
 						 //10 to -10
 
-
-			if(relativeIntersectY < -1)
-			{
+				if(relativeIntersectY < -1)
+				{
 				//create speed x y ratio
-				relativeIntersectY = relativeIntersectY * -1;
+					relativeIntersectY = relativeIntersectY * -1;
 
-
-				ballYVelocity = relativeIntersectY/2;
-				ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
-				ballYDirection = 1;
-
-
-
-			}
-			else if(relativeIntersectY > 1)
-			{
 
 					ballYVelocity = relativeIntersectY/2;
-					ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
+					ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2 + addedVelocity;
+					ballYDirection = 1;
+
+
+
+				}
+				else if(relativeIntersectY > 1)
+				{
+
+					ballYVelocity = relativeIntersectY/2;
+					ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2 + addedVelocity;
 					ballYDirection = -1;
 
 
-			}
-			else
-			{
-				ballYVelocity = relativeIntersectY/2 + addedVelocity;
+				}
+				else
+				{
+					ballYVelocity = relativeIntersectY/2 + addedVelocity;
 					//ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
+					ballXVelocity += addedVelocity;
+				//addedVelocity++;
 
-			}
+				}
 
 
-			addedVelocity++;
+				addedVelocity++;
 			ballXDirection *= -1;
 
 
@@ -766,8 +770,11 @@ void ball(void *argument)
 	  //Top
 	  if(ballYPosition < halfBallRadius || ballYPosition + halfBallRadius >= 60)
 	  {
-		  ballYDirection *= -1;
-		  ballXVelocity++;
+		  if(ballXPosition > 4 && ballXPosition < 124)
+		  {
+			  ballYDirection *= -1;
+			  ballXVelocity++;
+		  }
 
 
 	  }
@@ -827,27 +834,35 @@ void oponentPaddle(void *argument)
 	 //{
 
 
-	  if(ballYPosition < opponentYPosition - paddleLength/2)
+	  if(ballYPosition < opponentYPosition + paddleLength/2)
 	  {
-			if(opponentYPosition < SSD1306_HEIGHT - paddleLength/2)
-			{
-				if(opponentYPosition > paddleLength/2)
+
+
+
+				if(opponentYPosition > 0)
 			 	{
-					opponentYPosition--;
+
+
+
+					opponentYPosition = opponentYPosition-2;
+
+
 			 	}
-			 }
+
+
+
 
 
 	  }
-	  if(ballYPosition > opponentYPosition - paddleLength/2)
+	  if(ballYPosition > opponentYPosition + paddleLength/2)
 	  {
+
 
 			if(opponentYPosition < SSD1306_HEIGHT - paddleLength/2)
 			{
-				if(opponentYPosition > paddleLength/2)
-			 	{
-					opponentYPosition++;
-			 	}
+
+					opponentYPosition = opponentYPosition+2;
+
 			 }
 
 
@@ -950,6 +965,10 @@ void DrawScreen(void *argument)
 
 
 			 addedVelocity = 0;
+
+			 SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
+
+
 			 SSD1306_UpdateScreen();
 			 HAL_Delay(1500);
 
@@ -987,13 +1006,15 @@ void DrawScreen(void *argument)
 
 			 addedVelocity = 0;
 
+			 SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
+
 			 SSD1306_UpdateScreen();
 			 HAL_Delay(1500);
 
 		  }
 
 
-	SSD1306_DrawLine(0, ballYPosition, SSD1306_WIDTH , ballYPosition, SSD1306_COLOR_WHITE);
+	SSD1306_DrawLine(ballXPosition, 0, ballXPosition , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
 
 
 	  SSD1306_UpdateScreen();
