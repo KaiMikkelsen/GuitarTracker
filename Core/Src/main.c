@@ -124,7 +124,7 @@ int16_t defaultballXDirection = -1;
 int16_t defaultballYDirection = 0;
 //
 
-uint16_t addedVelocity = 0;
+const uint16_t addedVelocity = 1;
 
 int16_t ballXPosition;
 int16_t ballYPosition;
@@ -147,7 +147,7 @@ const uint16_t rightEdge = 123;
 uint16_t playerScored = 0;
 uint16_t opponentScored = 0;
 
-uint16_t defaultBallSpeed = 3;
+const uint16_t maxBallSpeed = 10;
 
 
 
@@ -617,8 +617,105 @@ void userPaddle(void *argument)
 
 void calculateXYVelocity(int16_t relativeIntersectY)
 {
-	ballYVelocity = relativeIntersectY/2;
-	ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
+	//ballYVelocity = relativeIntersectY;
+	//ballXVelocity = (((paddleLength/2) - relativeIntersectY)) + addedVelocity;
+
+	switch(relativeIntersectY)
+	{
+
+	case 10://68 Degrees
+		ballYVelocity = 5;//
+		ballXVelocity = 2;
+
+
+		break;
+	case 9://63 Degrees
+		ballYVelocity = 4;
+		ballXVelocity = 2;
+
+		break;
+	case 8://59 Degrees
+		ballYVelocity = 5;
+		ballXVelocity = 3;
+
+		break;
+	case 7://59 Degrees
+		ballYVelocity = 5;
+		ballXVelocity = 3;
+
+		break;
+	case 6://53 Degrees
+		ballYVelocity = 4;
+		ballXVelocity = 3;
+
+		break;
+	case 5://53 Degrees
+		ballYVelocity = 4;
+		ballXVelocity = 3;
+
+		break;
+	case 4://51 Degrees
+		ballYVelocity = 5;
+		ballXVelocity = 4;
+
+		break;
+	case 3://51 Degrees
+		ballYVelocity = 5;
+		ballXVelocity = 4;
+
+		break;
+	case 2://50 degrees
+		ballYVelocity = 6;
+		ballXVelocity = 5;
+
+		break;
+	case 1://45 Degrees
+		ballYVelocity = 5;
+		ballXVelocity = 5;
+
+		break;
+
+
+
+
+	}
+
+
+
+}
+
+void determineBallSpeedandDirection(int16_t paddlePosition)
+{
+	//Values between -10 and 10 (inclusive)
+	int16_t relativeIntersectY = (paddlePosition+(paddleLength/2)) - ballYPosition;
+
+	//Ball is on LOWER half of paddle
+	if(relativeIntersectY <= -1)
+	{
+		relativeIntersectY = relativeIntersectY * -1;
+		calculateXYVelocity(relativeIntersectY);
+		ballYDirection = 1;
+	}
+	//Ball is on UPPER half of paddle
+	else if(relativeIntersectY >= 1)
+	{
+		calculateXYVelocity(relativeIntersectY);
+		ballYDirection = -1;
+	}
+	//Right in middle of paddle
+	else if(relativeIntersectY == 0)
+	{
+		ballYVelocity = relativeIntersectY/2 + addedVelocity;
+		ballXVelocity += addedVelocity;
+	}
+
+	if(ballXVelocity >= maxBallSpeed)
+	{
+		ballXVelocity = maxBallSpeed;
+	}
+
+
+	ballXDirection *= -1; //This only gets called when a paddle is hit so change the direction
 
 }
 
@@ -670,110 +767,24 @@ void ball(void *argument)
 
 
 	  //Player
-	  else if(ballXPosition - ballRadius <= leftPlayableEdge)
+	  else if(ballXPosition - halfBallRadius <= leftPlayableEdge)
 	  {
 
 		 if((ballYPosition >= playerYPosition) && (ballYPosition <= playerYPosition + paddleLength) && (ballXDirection == -1))
 		 {
-			 int16_t relativeIntersectY = (playerYPosition+(paddleLength/2)) - ballYPosition;
-
-
-			 //ball is on LOWER half of paddle
-			 if(relativeIntersectY < -1)
-			 {
-
-				 relativeIntersectY = relativeIntersectY * -1;
-
-				 calculateXYVelocity(relativeIntersectY);
-
-				 //ballYVelocity = relativeIntersectY/2;
-				// ballXVelocity = (((paddleLength/2 - 1) - relativeIntersectY))/2 + addedVelocity;
-
-				 //addedVelocity++;
-				 ballYDirection = 1;
-
-
-
-			 }
-			 //ball is on UPPER half of paddle
-			 else if(relativeIntersectY > 1)
-			 {
-
-				 //ballYVelocity = relativeIntersectY/2;
-				// ballXVelocity = (((paddleLength/2) - relativeIntersectY))/2 + addedVelocity;
-
-				 calculateXYVelocity(relativeIntersectY);
-
-				 //addedVelocity++;
-				 ballYDirection = -1;
-
-
-			 }
-			 //right in middle of paddle
-			 else if(relativeIntersectY == 0)
-			 {
-
-				ballYVelocity = relativeIntersectY/2 + addedVelocity;
-				ballXVelocity += addedVelocity;
-				//addedVelocity++;
-			 }
-
-			addedVelocity++;
-		 	ballXDirection *= -1;
-
-
+			 determineBallSpeedandDirection(playerYPosition);
 		 }
 
 
 	  }
 
 	  //Opponent
-	  else if(ballXPosition + ballRadius >= rightPlayableEdge)
+	  else if(ballXPosition + halfBallRadius >= rightPlayableEdge)
 	  {
 
-		  if((ballYPosition >= opponentYPosition) && (ballYPosition <=opponentYPosition + paddleLength) && (ballXDirection == 1))
-		  {
-
-			  int16_t relativeIntersectY = (opponentYPosition+(paddleLength/2)) - ballYPosition;
-						 //10 to -10
-
-				if(relativeIntersectY < -1)
-				{
-				//create speed x y ratio
-					relativeIntersectY = relativeIntersectY * -1;
-
-
-					ballYVelocity = relativeIntersectY/2;
-					ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2 + addedVelocity;
-					ballYDirection = 1;
-
-
-
-				}
-				else if(relativeIntersectY > 1)
-				{
-
-					ballYVelocity = relativeIntersectY/2;
-					ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2 + addedVelocity;
-					ballYDirection = -1;
-
-
-				}
-				else
-				{
-					ballYVelocity = relativeIntersectY/2 + addedVelocity;
-					//ballXVelocity = ((paddleLength/2) - relativeIntersectY)/2;
-					ballXVelocity += addedVelocity;
-				//addedVelocity++;
-
-				}
-
-
-				addedVelocity++;
-			ballXDirection *= -1;
-
-
-
+		 if((ballYPosition >= opponentYPosition) && (ballYPosition <=opponentYPosition + paddleLength) && (ballXDirection == 1))
+		 {
+			  determineBallSpeedandDirection(opponentYPosition);
 		 }
 
 	  }
@@ -856,7 +867,7 @@ void oponentPaddle(void *argument)
 
 
 
-					opponentYPosition = opponentYPosition-2;
+					opponentYPosition = opponentYPosition-3;
 
 
 			 	}
@@ -873,7 +884,7 @@ void oponentPaddle(void *argument)
 			if(opponentYPosition < SSD1306_HEIGHT - paddleLength/2)
 			{
 
-					opponentYPosition = opponentYPosition+2;
+					opponentYPosition = opponentYPosition+3;
 
 			 }
 
@@ -976,7 +987,7 @@ void DrawScreen(void *argument)
 			 playerScored = 0;
 
 
-			 addedVelocity = 0;
+			 //addedVelocity = 0;
 
 			 SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
 
@@ -1016,7 +1027,7 @@ void DrawScreen(void *argument)
 			 opponentScore++;
 			 opponentScored = 0;
 
-			 addedVelocity = 0;
+			 //addedVelocity = 0;
 
 			 SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
 
