@@ -192,7 +192,7 @@ int main(void)
 
   SSD1306_Puts("Starting", &Font_11x18, 1);
   SSD1306_GotoXY(10, 30);
-  SSD1306_Puts("    Game: ", &Font_11x18, 1);
+  SSD1306_Puts("Game", &Font_11x18, 1);
   SSD1306_UpdateScreen();
 
   HAL_Delay(1000);
@@ -711,21 +711,21 @@ void oponentPaddle(void *argument)
   /* Infinite loop */
 
 	uint16_t dyPerFrame = 3;
-	uint16_t dy2 = 4;
-	uint16_t two = 1;
 
   for(;;)
   {
-	  if(3 % two == 0)
+
+
+	  if(playerScore <= opponentScore)//Adjust how hard depending on score to keep it fun
 	  {
-		  dyPerFrame = 4;
-		  two = 1;
+		  dyPerFrame = 2;
+
 	  }
 	  else
 	  {
-		  dyPerFrame = 3;
+		  dyPerFrame = 4;
 	  }
-	  two++;
+
 
 
 	  if(ballYPosition < opponentYPosition + paddleLength/2)
@@ -754,24 +754,29 @@ void displayScoreandReset()
 {
 
 	char msg[4];
-	SSD1306_GotoXY(40,10);
+	if(playerScore >= 10) //Adjust score so a single digit score doesn't look too weird
+	{
+		SSD1306_GotoXY(25,10);
+	}
+	else
+	{
+		SSD1306_GotoXY(40,10);
+	}
 
+	//Draw ScoreBoard
 	sprintf(msg, "%hu", playerScore);
-
 	SSD1306_Puts(&msg, &Font_16x26, 1);
+
 
 	SSD1306_GotoXY(74,10);
-
 	sprintf(msg, "%hu", opponentScore);
-
 	SSD1306_Puts(&msg, &Font_16x26, 1);
 
-	SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
 
+	SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
 	SSD1306_UpdateScreen();
 
-
-
+	//Reset default Positions
 	ballXPosition = defaultBallXPosition;
 	ballYPosition = defaultBallYPosition;
 
@@ -819,13 +824,10 @@ void DrawScreen(void *argument)
 
 		  if(playerScored)
 		  {
+			displayScoreandReset();
+			ballXDirection = -1;
 
-
-			 displayScoreandReset();
-			 ballXDirection = -1;
-
-
-			 HAL_Delay(1000);
+			HAL_Delay(1000);
 
 		  }
 		  if(opponentScored)
@@ -833,7 +835,6 @@ void DrawScreen(void *argument)
 
 			displayScoreandReset();
 			ballXDirection = 1;
-
 
 			HAL_Delay(1000);
 
