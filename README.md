@@ -17,7 +17,9 @@
 
 - Such a small limited number of pixels on the screen, and the minimum ball speed is 1pixel per frame, and i dont want to use floating point numbers as its not recommended for microcontroller programming, how can i do this with ints, while still creating playable movement in the x/y directions.
 - Solution:
-- 
+
+- Glitchy Player Paddle when moving joystick is pushed up
+- Solution: Quite sure this was caused by the ADC getting the almighty power of 5v when the joystick is moving up and fully open, which was causing some sort of communication issue. Fixed this by running the joystick on a 3v power supply which fixed the issue.
 
 
 ## Hours
@@ -29,7 +31,7 @@ January 6th
 - 2 Hours: Got it connecting with a better cable, reading adc values from a potentiometer
 
 January 7th
-- 2 Hours: Trying and failing to get serial communication working, sound sensor not really working.
+- 2 Hours: Trying and failing to get serial communication working, sound sensor not really working
 
 January 8th
 - 4 hours: Serial communication solved! looking into using a microphone IC instead of piezo buzzer as my electronics knowledge is lacking
@@ -46,6 +48,14 @@ January 11th
 January 12th
 - 2 hours: Back and forth gameplay working, next to implement is the score system
 
+January 13th
+- 1 hour: Improved back and forth gameplay, finding and fixing bugs
+
+January 14th
+- 4 hours: Huge Friday spend... Debugging, Got a fully functional game with minimal bugs working
+
+January 15th
+- 4 hours: Improved score system, AI and gameplay. Looking into using the esp8266 for wifi connectivity
 
 ## Resources
 
