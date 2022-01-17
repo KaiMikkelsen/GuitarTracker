@@ -57,6 +57,9 @@ January 14th
 January 15th
 - 4 hours: Improved score system, AI and gameplay. Looking into using the esp8266 for wifi connectivity
 
+January 16th
+- 5 hours: Trying to get uART communication with esp866 board, not having much luck..
+
 ## Resources
 
 Digikey stm32 tutorials: https://www.youtube.com/watch?v=EsZLgqhqfO0&ab_channel=Digi-Key
