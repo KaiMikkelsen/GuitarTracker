@@ -64,11 +64,14 @@ January 15th
 January 16th
 - 5 hours: Trying to get uART communication with esp866 board, not having much luck..
 
-- January 18th
+January 18th
 - 1 Hour: More uart stuff, tried with a a new empty project still no luck.
 
 January 19th
 - 1.5 hours: Still trying to get uart working, logic analyzer would be nice, going to go back and make sure I understand how UART actually works like I think
+
+January 20
+- 2 Hours: Success! UART has started working, not honestly sure what I did different, made sure UART was working over USB, will have to investigate tomorro
 
 ## Resources
 
