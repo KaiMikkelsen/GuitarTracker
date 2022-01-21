@@ -29,6 +29,11 @@
 #include<stdio.h>
 #include<string.h>
 
+#include "ESP8266_HAL.h"
+
+#include "ESP8266.H"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +55,7 @@ ADC_HandleTypeDef hadc1;
 
 I2C_HandleTypeDef hi2c1;
 
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* Definitions for userControl */
@@ -90,6 +96,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_USART1_UART_Init(void);
 void userPaddle(void *argument);
 void ball(void *argument);
 void oponentPaddle(void *argument);
@@ -166,7 +173,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+s   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -184,9 +191,61 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   MX_I2C1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  SSD1306_Init();
+  char attentionRestart[] = "AT+RST\r\n";
+  char msg2[] = "\nstarting\n";
+
+  char sending1[] = "sending 1\n";
+  char sending2[] = "sending 2\n";
+  char sending3[] = "sending 3\n";
+
+  char AT[] = "AT\r\n";
+  char ATRST[] = "AT+RST\r\n";
+
+  char GARBAGE[] = "GARGAGAGE";
+
+  char ATCWLAP [] = "AT+CWLAP\r\n";
+  char clientmode[] = "AT+CWMODE=1\r\n";
+
+  char ATCWJAP[] = "AT+CWJAP=Kaiphone,12345678";
+
+
+  char ATGMR[] = "AT+GMR\r\n";
+
+  char receieve[30] = {'\0'};
+  char receieve2[100] = {'\0'};
+  char receieve3[20] = {'\0'};
+
+  uint16_t YScrollValue = 10;
+
+  HAL_StatusTypeDef responseReceive;
+  HAL_StatusTypeDef responseTransmit;
+
+
+
+
+  HAL_UART_Transmit(&huart1, AT, strlen(AT), 1000);
+
+
+
+  HAL_UART_Receive(&huart1, receieve, 29, 10000);
+
+  HAL_UART_Transmit(&huart2, receieve, 29, 1000);
+
+
+  HAL_UART_Transmit(&huart1, ATGMR, strlen(ATGMR), 1000);
+
+
+
+  HAL_UART_Receive(&huart1, receieve2, 100, 10000);
+
+
+  HAL_UART_Transmit(&huart2, receieve2, 100, 1000);
+
+   SSD1306_Init();
+
 
   SSD1306_GotoXY(0,0);
 
@@ -417,6 +476,41 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -503,7 +597,7 @@ void userPaddle(void *argument)
 	  HAL_ADC_PollForConversion(&hadc1, 10);
 	  ADCValue = HAL_ADC_GetValue(&hadc1);
 
-	  if(ADCValue == 0)
+	  if(ADCValue < 20)//if(ADCValue == 0)
 	  {
 		  if(playerYPosition < SSD1306_HEIGHT - paddleLength) //Go Down
 		  {
@@ -512,7 +606,7 @@ void userPaddle(void *argument)
 
 	  }
 
-	  if(ADCValue == 4095)
+	  if(ADCValue > 4000)//if(ADCValue == 4095)
 	  {
 		  if(playerYPosition >= dyPerFrame)
 		  {
@@ -750,7 +844,24 @@ void oponentPaddle(void *argument)
 
 /* USER CODE BEGIN Header_DrawScreen */
 
-void displayScoreandReset()
+
+void resetGameDefaults()
+{
+
+	ballXPosition = defaultBallXPosition;
+	ballYPosition = defaultBallYPosition;
+
+	ballYDirection = defaultBallYDirection;
+
+	ballXVelocity = defaultBallXVelocity;
+	ballYVelocity = defaultBallYVelocity;
+
+	playerScored = 0;
+	opponentScored = 0;
+
+}
+
+void displayScore()
 {
 
 	char msg[4];
@@ -776,18 +887,6 @@ void displayScoreandReset()
 	SSD1306_DrawLine(SSD1306_WIDTH/2, 0, SSD1306_WIDTH/2 , SSD1306_HEIGHT, SSD1306_COLOR_WHITE);
 	SSD1306_UpdateScreen();
 
-	//Reset default Positions
-	ballXPosition = defaultBallXPosition;
-	ballYPosition = defaultBallYPosition;
-
-	ballYDirection = defaultBallYDirection;
-
-	ballXVelocity = defaultBallXVelocity;
-	ballYVelocity = defaultBallYVelocity;
-
-	playerScored = 0;
-	opponentScored = 0;
-
 }
 
 
@@ -803,12 +902,14 @@ void DrawScreen(void *argument)
   /* USER CODE BEGIN DrawScreen */
 
 
-	// uint16_t PlayerPaddleMoved;
-
+	char msg[4];
 
   /* Infinite loop */
   for(;;)
   {
+
+	  Server_Start();
+
 	  SSD1306_Clear();
 
 	  //Player Paddle
@@ -822,23 +923,55 @@ void DrawScreen(void *argument)
 
 
 
-		  if(playerScored)
-		  {
-			displayScoreandReset();
-			ballXDirection = -1;
+	  if(playerScore >= 11)
+	  {
 
-			HAL_Delay(1000);
 
-		  }
-		  if(opponentScored)
-		  {
+		  SSD1306_GotoXY(0,0);
+		  SSD1306_Puts("Player", &Font_11x18, 1);
+		  SSD1306_GotoXY(0,15);
+		  SSD1306_Puts("Wins!", &Font_11x18, 1);
+		  resetGameDefaults();
+		  playerScore = 0;
+		  opponentScore = 0;
+		  SSD1306_UpdateScreen();
 
-			displayScoreandReset();
-			ballXDirection = 1;
+		  HAL_Delay(2000);
 
-			HAL_Delay(1000);
+	  }
+	  else if(opponentScore >= 11)
+	  {
 
-		  }
+		 SSD1306_GotoXY(0,0);
+		 SSD1306_Puts("Opponent", &Font_11x18, 1);
+		 SSD1306_GotoXY(0,15);
+		 SSD1306_Puts("Wins!", &Font_11x18, 1);
+		 resetGameDefaults();
+		 playerScore = 0;
+		 opponentScore = 0;
+		 SSD1306_UpdateScreen();
+
+		 HAL_Delay(2000);
+
+	  }
+	  else if(playerScored)
+	  {
+		displayScore();
+		resetGameDefaults();
+		ballXDirection = -1;
+
+		HAL_Delay(1000);
+
+	  }
+	  else if(opponentScored)
+	  {
+		displayScore();
+		resetGameDefaults();
+		ballXDirection = 1;
+
+		HAL_Delay(1000);
+
+	  }
 
 
 
