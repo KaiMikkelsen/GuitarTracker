@@ -21,6 +21,10 @@
 - Glitchy Player Paddle when moving joystick is pushed up
 - Solution: Quite sure this was caused by the ADC getting the almighty power of 5v when the joystick is moving up and fully open, which was causing some sort of communication issue. Fixed this by running the joystick on a 3v power supply which fixed the issue.
 
+- UART with ESP8266 not working
+- Solution: None yet smh
+
+
 
 ## Hours
 
@@ -56,6 +60,18 @@ January 14th
 
 January 15th
 - 4 hours: Improved score system, AI and gameplay. Looking into using the esp8266 for wifi connectivity
+
+January 16th
+- 5 hours: Trying to get uART communication with esp866 board, not having much luck..
+
+January 18th
+- 1 Hour: More uart stuff, tried with a a new empty project still no luck.
+
+January 19th
+- 1.5 hours: Still trying to get uart working, logic analyzer would be nice, going to go back and make sure I understand how UART actually works like I think
+
+January 20
+- 2 Hours: Success! UART has started working, not honestly sure what I did different, made sure UART was working over USB, will have to investigate tomorro
 
 ## Resources
 
