@@ -173,7 +173,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-s   HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -215,7 +215,7 @@ s   HAL_Init();
   char ATGMR[] = "AT+GMR\r\n";
 
   char receieve[30] = {'\0'};
-  char receieve2[100] = {'\0'};
+  char receieve2[1000] = {'\0'};
   char receieve3[20] = {'\0'};
 
   uint16_t YScrollValue = 10;
@@ -235,14 +235,14 @@ s   HAL_Init();
   HAL_UART_Transmit(&huart2, receieve, 29, 1000);
 
 
-  HAL_UART_Transmit(&huart1, ATGMR, strlen(ATGMR), 1000);
+  HAL_UART_Transmit(&huart1, ATCWLAP, strlen(ATCWLAP), 1000);
 
 
 
-  HAL_UART_Receive(&huart1, receieve2, 100, 10000);
+  HAL_UART_Receive(&huart1, receieve2, 1000, 10000);
 
 
-  HAL_UART_Transmit(&huart2, receieve2, 100, 1000);
+  HAL_UART_Transmit(&huart2, receieve2, 1000, 1000);
 
    SSD1306_Init();
 
@@ -597,7 +597,7 @@ void userPaddle(void *argument)
 	  HAL_ADC_PollForConversion(&hadc1, 10);
 	  ADCValue = HAL_ADC_GetValue(&hadc1);
 
-	  if(ADCValue < 20)//if(ADCValue == 0)
+	  if(ADCValue < 50)//if(ADCValue == 0)
 	  {
 		  if(playerYPosition < SSD1306_HEIGHT - paddleLength) //Go Down
 		  {
@@ -908,7 +908,7 @@ void DrawScreen(void *argument)
   for(;;)
   {
 
-	  Server_Start();
+	  //Server_Start();
 
 	  SSD1306_Clear();
 
