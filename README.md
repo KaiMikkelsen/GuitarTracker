@@ -71,7 +71,13 @@ January 19th
 - 1.5 hours: Still trying to get uart working, logic analyzer would be nice, going to go back and make sure I understand how UART actually works like I think
 
 January 20
-- 2 Hours: Success! UART has started working, not honestly sure what I did different, made sure UART was working over USB, will have to investigate tomorro
+- 2 Hours: Success! UART has started working, not honestly sure what I did different, made sure UART was working over USB, will have to investigate tomorrow
+
+January 24th
+- 1 hour: looking more into UART commands
+
+January 25th
+- 1 hour: More Uart, trying to get an IP working on the esp8266
 
 ## Resources
 
