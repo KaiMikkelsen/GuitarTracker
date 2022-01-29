@@ -194,87 +194,11 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  char attentionRestart[] = "AT+RST\r\n";
-  char msg2[] = "\nstarting\n";
-
-  char sending1[] = "sending 1\n";
-  char sending2[] = "sending 2\n";
-  char sending3[] = "sending 3\n";
-
-  char AT[] = "AT\r\n";
-  char ATRST[] = "AT+RST\r\n";
-
-  char GARBAGE[] = "GARGAGAGE\n\n";
-
-  char ATCWLAP [] = "AT+CWLAP\r\n";
-  char clientmode[] = "AT+CWMODE=1\r\n";
-
-  char ATCWJAP[] = "AT+CWJAP=SPSETUP-5937,county8250elect";
-
-  char ATCIFSR[] = "AT+CIFSR\r\n";
-
-  char ATGMR[] = "AT+GMR\r\n";
-
-  char ATCWMODE[] = "AT+CWMODE=1\r\n";
-
-  char ATCIPMUX[] = "AT+CIPMUX=1\r\n";
-
-  char ATCIPSERVER[] = "AT+CIPSERVER=1,80\r\n";
-
-  char receieve[30] = {'\0'};
-  char receieve2[1000] = {'\0'};
-  char receieve3[1000] = {'\0'};
-  char receieve4[1000] = {'\0'};
-
   uint16_t YScrollValue = 10;
 
   HAL_StatusTypeDef responseReceive;
   HAL_StatusTypeDef responseTransmit;
 
-
-  HAL_UART_Transmit_IT(&huart2, GARBAGE, strlen(GARBAGE));
-
-
-  HAL_UART_Transmit_IT(&huart1, AT, strlen(AT));
-  HAL_UART_Receive_IT(&huart1, receieve, 29);
-  HAL_UART_Transmit(&huart2, receieve, 29, 1000);
-
-/*
-
-  HAL_UART_Transmit(&huart1, ATCWMODE, strlen(ATCWMODE), 1000);
-  HAL_UART_Receive(&huart1, receieve2, 20, 10000);
-  HAL_UART_Transmit(&huart2, receieve2, 1000, 1000);
-
-  char data[80];
-
-  char SSID[] = "SPSETUP-5937";
-  char PASSWD[] = "county8250elect";
-
-  sprintf (data, "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, PASSWD);
-  //Uart_sendstring(data, wifi_uart);
-  HAL_UART_Transmit(&huart1, data, strlen(data), 1000);
-  HAL_UART_Receive(&huart1, receieve3, 200, 10000);
-  HAL_UART_Transmit(&huart2, receieve3, 200, 1000);
-
-
-  HAL_UART_Transmit(&huart1, ATCIFSR, strlen(ATCIFSR), 1000);
-  HAL_UART_Receive(&huart1, receieve4, 200, 10000);
-  HAL_UART_Transmit(&huart2, receieve4, 200, 1000);
-
-
-  HAL_UART_Transmit(&huart1, ATCIPMUX, strlen(ATCIPMUX), 1000);
-  HAL_UART_Receive(&huart1, receieve4, 200, 10000);
-  HAL_UART_Transmit(&huart2, receieve4, 200, 1000);
-
-
-
-  HAL_UART_Transmit(&huart1, ATCIPSERVER, strlen(ATCIPSERVER), 1000);
-  HAL_UART_Receive(&huart1, receieve4, 200, 10000);
-  HAL_UART_Transmit(&huart2, receieve4, 200, 1000);
-
-
-
-*/
 
 
 
@@ -853,7 +777,6 @@ void oponentPaddle(void *argument)
 	  {
 		  dyPerFrame = 4;
 	  }
-
 
 
 	  if(ballYPosition < opponentYPosition + paddleLength/2)
