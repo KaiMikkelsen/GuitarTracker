@@ -86,7 +86,7 @@ January 25th
 - 1 hour: More Uart, trying to get an IP working on the esp8266
 
 Total: 60 Hours
-I started this project at the beginning of a work term, and was lucky that during the first week and and a bit I wasnt doing much programming at work, and so was keen to work on this when I get home. I also got covid and had nothing to do but program in my room for a week.
+I started this project at the beginning of a work term, and was lucky that during the first week and and a bit I wasnt doing much programming at work, and so was keen to work on this when I get home. Much of the project was also done during the week when I got covid.
 
 
 ## Resources
