@@ -2,24 +2,31 @@
 
 ## Problems I have faced:
 
-- STM32 Board not recognized as USB Device.
+- STM32 Board not recognized as USB Device
 
 Solution: Had to use a different cable, (the one for my wireless beats headphones)
 
+
 - Serial communication not working
+
 Solution: Created a fresh new project and realized UART was already configured automatically with the chip, so restarting it was just wasting my time.
 
+
 - Struggled to get values going from top of the screen to the bottom to represent the user paddle
+
 Solution: Looked at logic more closely
 
 - I2C communication with screen not working
+
 Solution: Having the potentiometer on the same power as the screen was messing with it, my knowledge of electronics is lacking clearly...
 Solution pt2: Figured out the potentiometer I was using to control user movement was shorting out the board or something, switched to a better joystick controller and am using the other side of the board for ADC which is working fine for now...
 
-- Such a small limited number of pixels on the screen, and the minimum ball speed is 1pixel per frame, and i dont want to use floating point numbers as its not recommended for microcontroller programming, how can i do this with ints, while still creating playable movement in the x/y directions.
+- Such a small limited number of pixels on the screen, and the minimum ball speed is 1pixel per frame, and i dont want to use floating point numbers as its not recommended for microcontroller programming, how can i do this with ints, while still creating playable movement in the x/y directions
+
 Solution: Because I only had to 10 numbers of possible speed, I just ended up hardcoding the values for each value from 1-10, I would have loved to think of a smart algorithm to do this but hardcoding x and y axis speed ended up being easier math and programming wise.
 
 - Glitchy Player Paddle when moving joystick is pushed up
+
 Solution: Quite sure this was caused by the ADC getting the almighty power of 5v when the joystick is moving up and fully open, which was causing some sort of communication issue. Fixed this by running the joystick on a 3v power supply which fixed the issue.
 
 
