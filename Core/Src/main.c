@@ -930,9 +930,6 @@ void DrawScreen(void *argument)
 
 	  }
 
-
-
-
 	  SSD1306_UpdateScreen();
 	  osDelay(1);
   }
