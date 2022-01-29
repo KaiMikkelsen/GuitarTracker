@@ -35,7 +35,7 @@ Solution: Quite sure this was caused by the ADC getting the almighty power of 5v
 ## Hours
 
 January 5th
-- 2 Hours: Trying to get it plugged in unsuccessfully, experiemnting with STLink
+- 2 Hours: Trying to get it plugged in unsuccessfully, experimenting with STLink
 
 January 6th
 - 2 Hours: Got it connecting with a better cable, reading adc values from a potentiometer
