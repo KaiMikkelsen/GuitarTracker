@@ -204,7 +204,7 @@ int main(void)
   char AT[] = "AT\r\n";
   char ATRST[] = "AT+RST\r\n";
 
-  char GARBAGE[] = "GARGAGAGE";
+  char GARBAGE[] = "GARGAGAGE\n\n";
 
   char ATCWLAP [] = "AT+CWLAP\r\n";
   char clientmode[] = "AT+CWMODE=1\r\n";
@@ -232,13 +232,14 @@ int main(void)
   HAL_StatusTypeDef responseTransmit;
 
 
+  HAL_UART_Transmit_IT(&huart2, GARBAGE, strlen(GARBAGE));
 
 
-  HAL_UART_Transmit(&huart1, AT, strlen(AT), 1000);
-  HAL_UART_Receive(&huart1, receieve, 29, 10000);
+  HAL_UART_Transmit_IT(&huart1, AT, strlen(AT));
+  HAL_UART_Receive_IT(&huart1, receieve, 29);
   HAL_UART_Transmit(&huart2, receieve, 29, 1000);
 
-
+/*
 
   HAL_UART_Transmit(&huart1, ATCWMODE, strlen(ATCWMODE), 1000);
   HAL_UART_Receive(&huart1, receieve2, 20, 10000);
@@ -273,7 +274,7 @@ int main(void)
 
 
 
-
+*/
 
 
 
@@ -639,7 +640,7 @@ void userPaddle(void *argument)
 
 	  }
 
-	  if(ADCValue > 4000)//if(ADCValue == 4095)
+	  if(ADCValue > 3500)//if(ADCValue == 4095)
 	  {
 		  if(playerYPosition >= dyPerFrame)
 		  {
